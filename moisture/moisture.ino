@@ -7,9 +7,13 @@
 #include <DHT_U.h>
 
 #define DHTPIN1            2         // Pin which is connected to the DHT sensor.
-#define DHTPIN2            3         // Pin which is connected to the DHT sensor.
+#define DHTPIN2            3
+#define DHTPIN3            4
+#define DHTPIN4            5
+#define DHTPIN5            6
+#define DHTPIN6            7
 
-#define N_SENSORS   2   //!< The number of sensors used
+#define N_SENSORS   6   //!< The number of sensors used
 // Uncomment the type of sensor in use:
 //#define DHTTYPE           DHT11     // DHT 11 
 #define DHTTYPE           DHT22     // DHT 22 (AM2302)
@@ -24,14 +28,21 @@ DHT_Unified *dht_array[N_SENSORS];
 uint32_t delayMS;
 
 void setup() {
+  int i;
   Serial.begin(9600); 
   // Initialize device.
   Serial.println("DHTxx Unified Sensor Example");
 
   dht_array[0] = new DHT_Unified(DHTPIN1,DHTTYPE);
   dht_array[1] = new DHT_Unified(DHTPIN2,DHTTYPE);
-  dht_array[0]->begin();
-  dht_array[1]->begin();
+  dht_array[2] = new DHT_Unified(DHTPIN3,DHTTYPE);
+  dht_array[3] = new DHT_Unified(DHTPIN4,DHTTYPE);
+  dht_array[4] = new DHT_Unified(DHTPIN5,DHTTYPE);
+  dht_array[5] = new DHT_Unified(DHTPIN6,DHTTYPE);
+  for(i=0;i<N_SENSORS;i++)
+  {
+    dht_array[i]->begin();
+  }
   // Print temperature sensor details.
   sensor_t sensor;
   dht_array[0]->temperature().getSensor(&sensor);
@@ -62,9 +73,9 @@ void setup() {
 void loop() {
   uint8_t i;
   // Delay between measurements.
-  delay(delayMS);
   // Get temperature event and print its value.
   sensors_event_t event; 
+  delay(delayMS);
 
   // Read all sensors
   for(i=0;i<N_SENSORS;i++)
