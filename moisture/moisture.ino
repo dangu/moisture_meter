@@ -80,16 +80,15 @@ void loop() {
   // Read all sensors
   for(i=0;i<N_SENSORS;i++)
   {
-    Serial.print("Sensor ");
-    Serial.println(i);
+    Serial.print(i);
+    Serial.print(";");
     dht_array[i]->temperature().getEvent(&event);
     if (isnan(event.temperature)) {
-      Serial.println("Error reading temperature!");
+      Serial.print("Error reading temperature!");
     }
     else {
-      Serial.print("Temperature: ");
       Serial.print(event.temperature);
-      Serial.println(" *C");
+      Serial.print(";");
     }
     // Get humidity event and print its value.
     dht_array[i]->humidity().getEvent(&event);
@@ -97,9 +96,7 @@ void loop() {
       Serial.println("Error reading humidity!");
     }
     else {
-      Serial.print("Humidity: ");
-      Serial.print(event.relative_humidity);
-      Serial.println("%");
+      Serial.println(event.relative_humidity);
     }
   }
 }
