@@ -84,7 +84,7 @@ void loop() {
     Serial.print(";");
     dht_array[i]->temperature().getEvent(&event);
     if (isnan(event.temperature)) {
-      Serial.print("Error reading temperature!");
+      Serial.print("Error reading temperature!;");
     }
     else {
       Serial.print(event.temperature);
