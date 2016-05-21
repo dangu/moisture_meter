@@ -24,7 +24,6 @@
 //   https://learn.adafruit.com/dht/overview
 
 
-SensorGroup *myGroup;
 
 
 DHT_Unified *dht_array[N_SENSORS];
@@ -38,18 +37,15 @@ public:
   void print_measurement();
 };
 
-void SensorGroup::test()
-{
-Serial.println("Test in the class");
-}
+
+SensorGroup *myGroup;
 
 void setup() {
   int i;
   sensor_t sensor;
-  Serial.begin(9600); 
-  // Initialize device.
-  Serial.println("DHTxx Unified Sensor Example");
+  Serial.begin(9600);
 
+  // Create the list of devices
   dht_array[0] = new DHT_Unified(DHTPIN1,DHTTYPE);
   dht_array[1] = new DHT_Unified(DHTPIN2,DHTTYPE);
   dht_array[2] = new DHT_Unified(DHTPIN3,DHTTYPE);
@@ -64,15 +60,25 @@ void setup() {
   // Set delay between sensor readings based on sensor details.
   dht_array[0]->humidity().getSensor(&sensor);
   delayMS = sensor.min_delay / 1000;
-  
-  
-  myGroup.print_measurement();
+
+  // Initialize the sensor group
+  myGroup = new SensorGroup;
 }
 
 void loop() {
-  // Delay between measurements.
-  delay(delayMS);
-  print_measurement();
+  String str;
+
+  if(Serial.available() > 0)
+  {
+    str = Serial.readStringUntil('\n');
+    str.trim();
+
+    // Get the data if the command is "read"
+    if(str=="read")
+    {
+      myGroup->print_measurement();
+    }
+  }
 }
 
 /** @brief Print data from all sensors */
@@ -103,5 +109,7 @@ void SensorGroup::print_measurement()
     }
   }
 }
+
+
 
 
