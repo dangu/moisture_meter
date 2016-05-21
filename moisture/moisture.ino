@@ -29,6 +29,7 @@ uint32_t delayMS;
 
 void setup() {
   int i;
+  sensor_t sensor;
   Serial.begin(9600); 
   // Initialize device.
   Serial.println("DHTxx Unified Sensor Example");
@@ -43,40 +44,22 @@ void setup() {
   {
     dht_array[i]->begin();
   }
-  // Print temperature sensor details.
-  sensor_t sensor;
-  dht_array[0]->temperature().getSensor(&sensor);
-  Serial.println("------------------------------------");
-  Serial.println("Temperature");
-  Serial.print  ("Sensor:       "); Serial.println(sensor.name);
-  Serial.print  ("Driver Ver:   "); Serial.println(sensor.version);
-  Serial.print  ("Unique ID:    "); Serial.println(sensor.sensor_id);
-  Serial.print  ("Max Value:    "); Serial.print(sensor.max_value); Serial.println(" *C");
-  Serial.print  ("Min Value:    "); Serial.print(sensor.min_value); Serial.println(" *C");
-  Serial.print  ("Resolution:   "); Serial.print(sensor.resolution); Serial.println(" *C");  
-  Serial.println("------------------------------------");
-  // Print humidity sensor details.
-  dht_array[0]->humidity().getSensor(&sensor);
-  Serial.println("------------------------------------");
-  Serial.println("Humidity");
-  Serial.print  ("Sensor:       "); Serial.println(sensor.name);
-  Serial.print  ("Driver Ver:   "); Serial.println(sensor.version);
-  Serial.print  ("Unique ID:    "); Serial.println(sensor.sensor_id);
-  Serial.print  ("Max Value:    "); Serial.print(sensor.max_value); Serial.println("%");
-  Serial.print  ("Min Value:    "); Serial.print(sensor.min_value); Serial.println("%");
-  Serial.print  ("Resolution:   "); Serial.print(sensor.resolution); Serial.println("%");  
-  Serial.println("------------------------------------");
+
   // Set delay between sensor readings based on sensor details.
   delayMS = sensor.min_delay / 1000;
 }
 
 void loop() {
-  uint8_t i;
   // Delay between measurements.
-  // Get temperature event and print its value.
-  sensors_event_t event; 
   delay(delayMS);
+  print_measurement();
+}
 
+/** @brief Print data from all sensors */
+void print_measurement()
+{
+  uint8_t i;
+  sensors_event_t event; 
   // Read all sensors
   for(i=0;i<N_SENSORS;i++)
   {
@@ -100,3 +83,5 @@ void loop() {
     }
   }
 }
+
+
