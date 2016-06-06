@@ -12,6 +12,7 @@ class Logger:
         """Init method"""
         self.ser = serial.Serial(port=portName)
         self.ser.timeout=2 # [s] timeout
+        self.ser.baudrate =9600
  
         # configure logging
         self.log = logging.basicConfig(level=logging.INFO,
@@ -38,9 +39,7 @@ class Logger:
                 #print "Time to sleep: %g" %timeToSleep
                         
                 time.sleep(max(0, timeToSleep)) # Sleeping this time
-                self.ser.write("read\n")
-                self.ser.baudrate =9600
-                resp=self.ser.readlines()
+                resp=getReading()
                 # Do not log empty data
                 if resp != '':
                     logString=""
@@ -52,7 +51,13 @@ class Logger:
                 break
             except:
                 error(traceback.format_exc())
-         
+
+    def getReading(self):
+        """Get a reading of all sensors"""
+        self.ser.write("read\n")
+        resp=self.ser.readlines()
+        return resp
+        
                 
     def close(self):
         self.ser.close()
