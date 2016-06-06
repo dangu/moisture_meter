@@ -22,7 +22,7 @@ class Logger:
 
     def start(self):
         """Start logging"""
-        sampleTime=3 #[s]
+        sampleTime=5*60 #[s]
         oldtime=time.time()-sampleTime
         timeToSleep=sampleTime
         oldTimeToSleep = timeToSleep
@@ -51,10 +51,8 @@ class Logger:
             except KeyboardInterrupt:
                 break
             except:
-                error("Error 1")
                 error(traceback.format_exc())
-                error("Error 2")
-        
+         
                 
     def close(self):
         self.ser.close()
