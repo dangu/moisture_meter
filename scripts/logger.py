@@ -39,7 +39,7 @@ class Logger:
                 #print "Time to sleep: %g" %timeToSleep
                         
                 time.sleep(max(0, timeToSleep)) # Sleeping this time
-                resp=getReading()
+                resp=self.getReading()
                 # Do not log empty data
                 if resp != '':
                     logString=""
