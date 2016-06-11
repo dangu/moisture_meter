@@ -32,7 +32,7 @@ class Logger:
                 realDelay=(time.time()-oldtime)
                 operationTime = realDelay-oldTimeToSleep
                 #print "Operation time: %g" %operationTime
-                timeToSleep =sampleTime-operationTime
+                timeToSleep =self.sampleTime-operationTime
                 #print "Real delay: %g" %(realDelay)
                 oldtime=time.time()
                 oldTimeToSleep = timeToSleep
