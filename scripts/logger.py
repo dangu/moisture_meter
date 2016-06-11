@@ -3,17 +3,18 @@ import serial
 import time
 import logging
 import traceback
+import sys
 
 info = logging.getLogger(__name__).info
 error = logging.getLogger(__name__).error
 
 class Logger:
-    def __init__(self, portName, logfile):
+    def __init__(self, portName, logfile, sampleTime):
         """Init method"""
         self.ser = serial.Serial(port=portName)
         self.ser.timeout=2 # [s] timeout
         self.ser.baudrate =9600
- 
+        self.sampleTime = sampleTime
         # configure logging
         self.log = logging.basicConfig(level=logging.INFO,
                         filename=logfile, # log to this file
@@ -23,9 +24,8 @@ class Logger:
 
     def start(self):
         """Start logging"""
-        sampleTime=5*60 #[s]
-        oldtime=time.time()-sampleTime
-        timeToSleep=sampleTime
+        oldtime=time.time()-self.sampleTime
+        timeToSleep=self.sampleTime
         oldTimeToSleep = timeToSleep
         while(True):
             try:
@@ -64,7 +64,16 @@ class Logger:
 
 
 if __name__=="__main__":
-    myLogger = Logger("/dev/ttyUSB0", "room.log")
-    myLogger.start()
-    myLogger.close()
+    if len(sys.argv) <2:
+        print "Joh"
+        print "No input arguments, defaulting to /dev/ttyUSB0, room.log, sampleTime=300"
+        myLogger = Logger("/dev/ttyUSB0", "room.log", sampleTime=300)
+        myLogger.start()
+        myLogger.close()
+    else:
+        if("test" in sys.argv[1]):
+            print "Test mode..."
+            while(1):
+                myLogger = Logger("/dev/ttyUSB0", "test.log", sampleTime=5)
+                print myLogger.getReading()
 
