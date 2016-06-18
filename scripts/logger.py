@@ -129,8 +129,7 @@ class Db:
         
     def addData(self,ts,measurement_values):
         """Add one measurement to the database"""
-        c = self.conn.cursor()
-        
+        c = self.conn.cursor()        
 
         # Add measurement
         c.execute ('INSERT INTO measurements (ts) VALUES (?)', ts)
@@ -139,18 +138,28 @@ class Db:
         for value in measurement_values:
             c.execute('INSERT INTO measurement_values (measurement_id, sensor_id, temperature, rh) VALUES (?,?,?,?)', 
                       (measurement_id,value['sensor_id'],) + value['values'])
-            self.conn.commit()
-    def addOldData(self):
-        ts = (time.strftime("%Y%m%d-%H:%M:%S"),)
-        
-        data=[{'sensor_id':1, 'values':(18,57,)},{'sensor_id':2, 'values':(18,57,)},{'sensor_id':5, 'values':(18,57,)}]
-        self.addData(ts,data)  
+    def addOldData(self, filename):
+        inFile = open(filename,'r')
+        for line in inFile:
+            row = line.strip()
+            inData = row.split(';')
+            ts = (inData[0][0:19],)
+            data = []
+            for sensorId in range(6):
+                temp = inData[3+sensorId*3]
+                rh = inData[4+sensorId*3]
+                if not (("Error" in temp) or ("Error" in rh)):
+                    data.append({'sensor_id':sensorId, 'values':(float(temp),float(rh),)})
+                    self.addData(ts,data) 
+                else:
+                    print "Error found here: " + row 
+        self.conn.commit()
         
 if __name__=="__main__":
     myDb = Db('measurement.sqlite')
-#    myDb.createTables()
-#    myDb.update1()
-    myDb.addOldData()
+    myDb.createTables()
+    myDb.update1()
+    myDb.addOldData('room.log')
     
 
 
