@@ -68,14 +68,47 @@ class Db:
         self.conn = sqlite3.connect(dbFilename)
 
 
-    def createTable(self):
+    def createTables(self):
         c = self.conn.cursor()
-        # Create table
-        c.execute('''CREATE TABLE stocks
-                     (date text, trans text, symbol text, qty real, price real)''')
         
-        # Insert a row of data
-        c.execute("INSERT INTO stocks VALUES ('2006-01-05','BUY','RHAT',100,35.14)")
+        # Create table senors
+        c.execute('''
+                CREATE TABLE sensors (
+                    id integer primary key autoincrement not null,
+                    name varchar,
+                    description varchar,
+                    enabled boolean default 1
+                );
+            ''')
+
+        # Create table measurements
+        c.execute('''
+                CREATE TABLE measurements (
+                    id integer primary key autoincrement not null,
+                    ts timestamp
+                );
+            ''')
+
+        # Create table values
+        c.execute('''
+                CREATE TABLE values (
+                    measurement_id integer primary key autoincrement not null,
+                    sensor_id integer,
+                    moisture float,
+                    temperature float
+                );
+            ''')
+        
+        # Create indexes
+        c.execute('''CREATE UNIQUE INDEX "unique_values" ON "values" ("measurement_id" ASC, "sensor_id" ASC)''')
+        
+        # Insert sensors
+        c.execute("INSERT INTO sensors (name, description) VALUES ('Sensor 1','Monterad i väggen mot vägen')")
+        c.execute("INSERT INTO sensors (name, description) VALUES ('Sensor 2','Monterad i väggen mot vägen')")
+        c.execute("INSERT INTO sensors (name, description) VALUES ('Sensor 3','Monterad i väggen mot vägen')")
+        c.execute("INSERT INTO sensors (name, description) VALUES ('Sensor 4','Monterad i väggen mot vägen')")
+        c.execute("INSERT INTO sensors (name, description) VALUES ('Sensor 5','Monterad i väggen mot vägen')")
+        c.execute("INSERT INTO sensors (name, description) VALUES ('Sensor 6','Monterad i väggen mot vägen')")
         
         # Save (commit) the changes
         self.conn.commit()
