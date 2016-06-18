@@ -127,33 +127,30 @@ class Db:
         # Save (commit) the changes
         self.conn.commit()
         
-    def addData(self):
-        """Add some data to the database"""
+    def addData(self,ts,measurement_values):
+        """Add one measurement to the database"""
         c = self.conn.cursor()
         
-        ts = (time.strftime("%Y%m%d-%H:%M:%S"),)
-        
+
         # Add measurement
         c.execute ('INSERT INTO measurements (ts) VALUES (?)', ts)
         measurement_id = c.lastrowid
         
-        measurement_values = [
-                                (1, 18, 57),
-                                (2, 19, 58),
-                                (3, 19, 55),
-                                (4, 19, 53),
-                                (5, 19, 56),
-                                (6, 15, 58)
-                            ]
         for value in measurement_values:
-            c.execute('INSERT INTO measurement_values (measurement_id, sensor_id, temperature, rh) VALUES (?,?,?,?)', (measurement_id,)+value)
-            self.conn.commit()    
+            c.execute('INSERT INTO measurement_values (measurement_id, sensor_id, temperature, rh) VALUES (?,?,?,?)', 
+                      (measurement_id,value['sensor_id'],) + value['values'])
+            self.conn.commit()
+    def addOldData(self):
+        ts = (time.strftime("%Y%m%d-%H:%M:%S"),)
+        
+        data=[{'sensor_id':1, 'values':(18,57,)},{'sensor_id':2, 'values':(18,57,)},{'sensor_id':5, 'values':(18,57,)}]
+        self.addData(ts,data)  
         
 if __name__=="__main__":
     myDb = Db('measurement.sqlite')
 #    myDb.createTables()
 #    myDb.update1()
-    myDb.addData()
+    myDb.addOldData()
     
 
 
