@@ -85,15 +85,15 @@ class Db:
         c.execute('''
                 CREATE TABLE measurements (
                     id integer primary key autoincrement not null,
-                    ts timestamp
+                    ts datetime
                 );
             ''')
 
         # Create table values
         c.execute('''
                 CREATE TABLE measurement_values (
-                    measurement_id integer primary key autoincrement not null,
-                    sensor_id integer,
+                    measurement_id integer not null,
+                    sensor_id integer not null,
                     temperature float
                 );
             ''')
@@ -123,15 +123,37 @@ class Db:
         c.execute('''
                 ALTER TABLE measurement_values ADD 
                     rh float
-                
             ''')
         # Save (commit) the changes
         self.conn.commit()
         
+    def addData(self):
+        """Add some data to the database"""
+        c = self.conn.cursor()
+        
+        ts = (time.strftime("%Y%m%d-%H:%M:%S"),)
+        
+        # Add measurement
+        c.execute ('INSERT INTO measurements (ts) VALUES (?)', ts)
+        measurement_id = c.lastrowid
+        
+        measurement_values = [
+                                (1, 18, 57),
+                                (2, 19, 58),
+                                (3, 19, 55),
+                                (4, 19, 53),
+                                (5, 19, 56),
+                                (6, 15, 58)
+                            ]
+        for value in measurement_values:
+            c.execute('INSERT INTO measurement_values (measurement_id, sensor_id, temperature, rh) VALUES (?,?,?,?)', (measurement_id,)+value)
+            self.conn.commit()    
+        
 if __name__=="__main__":
     myDb = Db('measurement.sqlite')
-    #myDb.createTables()
-    myDb.update1()
+#    myDb.createTables()
+#    myDb.update1()
+    myDb.addData()
     
 
 
