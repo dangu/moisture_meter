@@ -94,7 +94,6 @@ class Db:
                 CREATE TABLE measurement_values (
                     measurement_id integer primary key autoincrement not null,
                     sensor_id integer,
-                    moisture float,
                     temperature float
                 );
             ''')
@@ -113,14 +112,26 @@ class Db:
         # Save (commit) the changes
         self.conn.commit()
         
+    def close(self):
         # We can also close the connection if we are done with it.
         # Just be sure any changes have been committed or they will be lost.
         self.conn.close()
         
-
+    def update1(self):
+        """Alter some tables"""
+        c = self.conn.cursor()
+        c.execute('''
+                ALTER TABLE measurement_values ADD 
+                    rh float
+                
+            ''')
+        # Save (commit) the changes
+        self.conn.commit()
+        
 if __name__=="__main__":
     myDb = Db('measurement.sqlite')
-    myDb.createTables()
+    #myDb.createTables()
+    myDb.update1()
     
 
 
