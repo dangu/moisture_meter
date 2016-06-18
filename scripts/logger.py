@@ -91,7 +91,7 @@ class Db:
 
         # Create table values
         c.execute('''
-                CREATE TABLE values (
+                CREATE TABLE measurement_values (
                     measurement_id integer primary key autoincrement not null,
                     sensor_id integer,
                     moisture float,
@@ -100,15 +100,15 @@ class Db:
             ''')
         
         # Create indexes
-        c.execute('''CREATE UNIQUE INDEX "unique_values" ON "values" ("measurement_id" ASC, "sensor_id" ASC)''')
+        c.execute('''CREATE UNIQUE INDEX "unique_values" ON "measurement_values" ("measurement_id" ASC, "sensor_id" ASC)''')
         
         # Insert sensors
-        c.execute("INSERT INTO sensors (name, description) VALUES ('Sensor 1','Monterad i väggen mot vägen')")
-        c.execute("INSERT INTO sensors (name, description) VALUES ('Sensor 2','Monterad i väggen mot vägen')")
-        c.execute("INSERT INTO sensors (name, description) VALUES ('Sensor 3','Monterad i väggen mot vägen')")
-        c.execute("INSERT INTO sensors (name, description) VALUES ('Sensor 4','Monterad i väggen mot vägen')")
-        c.execute("INSERT INTO sensors (name, description) VALUES ('Sensor 5','Monterad i väggen mot vägen')")
-        c.execute("INSERT INTO sensors (name, description) VALUES ('Sensor 6','Monterad i väggen mot vägen')")
+        c.execute("INSERT INTO sensors (name, description) VALUES ('Sensor 1','Monterad')")
+        c.execute("INSERT INTO sensors (name, description) VALUES ('Sensor 2','Monterad')")
+        c.execute("INSERT INTO sensors (name, description) VALUES ('Sensor 3','Monterad')")
+        c.execute("INSERT INTO sensors (name, description) VALUES ('Sensor 4','Monterad')")
+        c.execute("INSERT INTO sensors (name, description) VALUES ('Sensor 5','Monterad')")
+        c.execute("INSERT INTO sensors (name, description) VALUES ('Sensor 6','Monterad')")
         
         # Save (commit) the changes
         self.conn.commit()
@@ -120,6 +120,7 @@ class Db:
 
 if __name__=="__main__":
     myDb = Db('measurement.sqlite')
+    myDb.createTables()
     
 
 
