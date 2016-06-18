@@ -155,6 +155,15 @@ class Db:
                     print "Error found here: " + row 
         self.conn.commit()
         
+    def getData(self):
+        """
+        SELECT ts, rh 
+FROM measurement_values mv
+INNER JOIN measurements m ON m.id=mv.measurement_id
+WHERE sensor_id=2 AND ts >="2016-06-15 00:00:00" AND ts <="2016-06-16 00:00:00"
+"""
+        pass
+        
 if __name__=="__main__":
     myDb = Db('measurement.sqlite')
     myDb.createTables()
