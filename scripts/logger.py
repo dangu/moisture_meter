@@ -4,6 +4,7 @@ import time
 import logging
 import traceback
 import sys
+import sqlite3
 
 info = logging.getLogger(__name__).info
 error = logging.getLogger(__name__).error
@@ -62,18 +63,30 @@ class Logger:
     def close(self):
         self.ser.close()
 
+class Db:
+    def __init__(self, dbFilename):
+        self.conn = sqlite3.connect(dbFilename)
+
+
+    def createTable(self):
+        c = self.conn.cursor()
+        # Create table
+        c.execute('''CREATE TABLE stocks
+                     (date text, trans text, symbol text, qty real, price real)''')
+        
+        # Insert a row of data
+        c.execute("INSERT INTO stocks VALUES ('2006-01-05','BUY','RHAT',100,35.14)")
+        
+        # Save (commit) the changes
+        self.conn.commit()
+        
+        # We can also close the connection if we are done with it.
+        # Just be sure any changes have been committed or they will be lost.
+        self.conn.close()
+        
 
 if __name__=="__main__":
-    if len(sys.argv) <2:
-        print "Joh"
-        print "No input arguments, defaulting to /dev/ttyUSB0, room.log, sampleTime=300"
-        myLogger = Logger("/dev/ttyUSB0", "room.log", sampleTime=300)
-        myLogger.start()
-        myLogger.close()
-    else:
-        if("test" in sys.argv[1]):
-            print "Test mode..."
-            while(1):
-                myLogger = Logger("/dev/ttyUSB0", "test.log", sampleTime=5)
-                print myLogger.getReading()
+    myDb = Db('measurement.sqlite')
+    
+
 
