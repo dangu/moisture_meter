@@ -218,12 +218,21 @@ WHERE sensor_id=2 AND ts >="2016-06-15 00:00:00" AND ts <="2016-06-16 00:00:00"
 """
         pass
     
-
-def testDb():
-    """Test database functions"""
-    myDb = Db('measurement.sqlite')
+def createDb(dbFilename):
+    """Create the database with the default tables"""
+    myDb = Db(dbFilename)
     myDb.createTables()
     myDb.update1()
+
+    myDb.close()
+    
+def testDb():
+    """Test database functions"""
+    dbFilename = "measurement.sqlite"
+    createDb(dbFilename)
+    
+    # Add old log data
+    myDb = Db(dbFilename)
     myDb.addOldData('room.log')
     
     # Connect the database to the logger and start logging
@@ -235,8 +244,10 @@ def testSimulation():
     """Test simulated data"""
     mode = 0
     if mode ==0:
-        print "No input arguments, defaulting to /dev/ttyUSB0, room.log, sampleTime=300"
+        print "No input arguments, defaulting to /dev/ttyUSB0, room.log, measurement.sqlite, sampleTime=300"
         myLogger = Logger("/dev/ttyUSB0", "test1.log", sampleTime=3)
+        myDb = Db("measurement.sqlite")
+        myLogger.attachDb(myDb)
         myLogger.start()
         myLogger.close()
     else:
@@ -244,8 +255,35 @@ def testSimulation():
         while(1):
             myLogger = Logger("/dev/ttyUSB0", "test2.log", sampleTime=5)
             print myLogger.getReading()
+            
 if __name__=="__main__":
-    testDb()
-    
+    if len(sys.argv) <2:
+        sampleTime = 3
+        print "No input arguments, defaulting to /dev/ttyUSB0, room.log, measurement.sqlite, sampleTime=%ds" %sampleTime
+        myLogger = Logger("/dev/ttyUSB0", "room.log", sampleTime=sampleTime)
+        myDb = Db("measurement.sqlite")
+        myLogger.attachDb(myDb)
+        myLogger.start()
+        myLogger.close()
+    else:
+        if("test" in sys.argv[1]):
+            print "Test mode..."
+            while(1):
+                myLogger = Logger("/dev/ttyUSB0", "test.log", sampleTime=5)
+                print myLogger.getReading()
+        elif "create_db" in sys.argv[1] and len(sys.argv)==(2+1):
+            dbFilename = sys.argv[2]
+            print "Creating empty database with name " + dbFilename
+            createDb(dbFilename)
+
+        elif "add_old" in sys.argv[1] and len(sys.argv)==(3+1):
+            print "Adding old data to the database..."
+            logFilename = sys.argv[2]
+            dbFilename = sys.argv[3]
+                # Add old log data
+            myDb = Db(dbFilename)
+            myDb.addOldData(logFilename)
+            myDb.close()
+      
 
 
