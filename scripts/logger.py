@@ -258,7 +258,7 @@ def testSimulation():
             
 if __name__=="__main__":
     if len(sys.argv) <2:
-        sampleTime = 3
+        sampleTime = 5*60 #[s]
         print "No input arguments, defaulting to /dev/ttyUSB0, room.log, measurement.sqlite, sampleTime=%ds" %sampleTime
         myLogger = Logger("/dev/ttyUSB0", "room.log", sampleTime=sampleTime)
         myDb = Db("measurement.sqlite")
