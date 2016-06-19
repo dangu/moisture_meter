@@ -149,12 +149,12 @@ class Db:
         c.execute('''CREATE UNIQUE INDEX "unique_values" ON "measurement_values" ("measurement_id" ASC, "sensor_id" ASC)''')
         
         # Insert sensors
-        c.execute("INSERT INTO sensors (name, description) VALUES ('Sensor 1','Monterad')")
-        c.execute("INSERT INTO sensors (name, description) VALUES ('Sensor 2','Monterad')")
-        c.execute("INSERT INTO sensors (name, description) VALUES ('Sensor 3','Monterad')")
-        c.execute("INSERT INTO sensors (name, description) VALUES ('Sensor 4','Monterad')")
-        c.execute("INSERT INTO sensors (name, description) VALUES ('Sensor 5','Monterad')")
-        c.execute("INSERT INTO sensors (name, description) VALUES ('Sensor 6','Monterad')")
+        c.execute("INSERT INTO sensors (name, description) VALUES ('Sensor 0','Blue. Position C. In wall, upper left.')")
+        c.execute("INSERT INTO sensors (name, description) VALUES ('Sensor 1','Blue/White. Position A. In wall lower left.')")
+        c.execute("INSERT INTO sensors (name, description) VALUES ('Sensor 2','Green. Position D2. In wall center.')")
+        c.execute("INSERT INTO sensors (name, description) VALUES ('Sensor 3','Green/White. Position D1. In air gap center.')")
+        c.execute("INSERT INTO sensors (name, description) VALUES ('Sensor 4','Purple. Position E1. In air gap right wall.')")
+        c.execute("INSERT INTO sensors (name, description) VALUES ('Sensor 5','Purple/White. Position E2. In right wall.')")
         
         # Save (commit) the changes
         self.conn.commit()
