@@ -5,14 +5,40 @@ import logging
 import traceback
 import sys
 import sqlite3
+import random
 
 info = logging.getLogger(__name__).info
 error = logging.getLogger(__name__).error
 
+SIMULATION = True
+
+class SerialSimulator:
+    """Class used for simulating serial data"""
+    def __init__(self):
+        """Init"""
+        self.timeout=None
+        self.baudrate = None
+    def write(self, dataToWrite):
+        """Simulated serial write"""
+        pass
+    def readlines(self):
+        """Simulated serial read"""
+        temperature0 = 15
+        rh0 = 57
+        dataStr=[]
+        for sensorId in range(6):
+            temperature = temperature0 + random.random()*4
+            rh = rh0 + random.random()*5
+            dataStr.append("%d;%.2f;%.2f\n" %(sensorId, temperature, rh))
+        return dataStr
+
 class Logger:
     def __init__(self, portName, logfile, sampleTime):
         """Init method"""
-        self.ser = serial.Serial(port=portName)
+        if SIMULATION:
+            self.ser = SerialSimulator()
+        else:
+            self.ser = serial.Serial(port=portName)
         self.ser.timeout=2 # [s] timeout
         self.ser.baudrate =9600
         self.sampleTime = sampleTime
@@ -163,12 +189,30 @@ INNER JOIN measurements m ON m.id=mv.measurement_id
 WHERE sensor_id=2 AND ts >="2016-06-15 00:00:00" AND ts <="2016-06-16 00:00:00"
 """
         pass
-        
-if __name__=="__main__":
+    
+
+def testDb():
+    """Test database functions"""
     myDb = Db('measurement.sqlite')
     myDb.createTables()
     myDb.update1()
     myDb.addOldData('room.log')
+    
+def testSimulation():
+    """Test simulated data"""
+    mode = 0
+    if mode ==0:
+        print "No input arguments, defaulting to /dev/ttyUSB0, room.log, sampleTime=300"
+        myLogger = Logger("/dev/ttyUSB0", "test1.log", sampleTime=3)
+        myLogger.start()
+        myLogger.close()
+    else:
+        print "Test mode..."
+        while(1):
+            myLogger = Logger("/dev/ttyUSB0", "test2.log", sampleTime=5)
+            print myLogger.getReading()
+if __name__=="__main__":
+    testSimulation()
     
 
 
