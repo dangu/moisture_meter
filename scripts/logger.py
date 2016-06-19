@@ -46,8 +46,11 @@ class Logger:
         self.log = logging.basicConfig(level=logging.INFO,
                         filename=logfile, # log to this file
                         format='%(asctime)s;%(levelname)s;%(message)s') # include timestamp
+        self.db = None # Start with no database connection
 
- 
+    def attachDb(self, db):
+        """Attach a database object"""
+        self.db = db
 
     def start(self):
         """Start logging"""
@@ -67,6 +70,7 @@ class Logger:
                         
                 time.sleep(max(0, timeToSleep)) # Sleeping this time
                 resp=self.getReading()
+                ts = time.strftime("%Y-%m-%d %H:%M:%S") # Get timestamp
                 # Do not log empty data
                 if resp != '':
                     logString=""
@@ -74,6 +78,23 @@ class Logger:
                         logString += data.strip() + ";"
                     logString = logString[:-1]
                     info(logString)
+                    
+                    # Log to database
+                    if self.db is not None:
+                        data = []
+                        for line in resp:
+                            strippedData = line.strip()
+                            dataList = strippedData.split(';')
+                            sensorId = int(dataList[0])
+                            temp    = dataList[1]
+                            rh      = dataList[2]
+                            if not (("Error" in temp) or ("Error" in rh)):
+                                data.append({'sensor_id':sensorId, 'values':(float(temp),float(rh),)})
+                            else:
+                                error("Sensor read error: " + str(dataList))
+                        self.db.addData(ts,data) 
+                        self.db.commit()
+                        
             except KeyboardInterrupt:
                 break
             except:
@@ -142,6 +163,10 @@ class Db:
         # We can also close the connection if we are done with it.
         # Just be sure any changes have been committed or they will be lost.
         self.conn.close()
+    
+    def commit(self):
+        """Commit the changes"""
+        self.conn.commit()
         
     def update1(self):
         """Alter some tables"""
@@ -154,11 +179,14 @@ class Db:
         self.conn.commit()
         
     def addData(self,ts,measurement_values):
-        """Add one measurement to the database"""
+        """Add one measurement to the database
+        ts    A string with the timestamp to use
+        measurement_values    A list with dicts with the keys sensor_id and values     
+        """
         c = self.conn.cursor()        
 
         # Add measurement
-        c.execute ('INSERT INTO measurements (ts) VALUES (?)', ts)
+        c.execute ('INSERT INTO measurements (ts) VALUES (?)', (ts,))
         measurement_id = c.lastrowid
         
         for value in measurement_values:
@@ -169,16 +197,16 @@ class Db:
         for line in inFile:
             row = line.strip()
             inData = row.split(';')
-            ts = (inData[0][0:19],)
+            ts = inData[0][0:19]
             data = []
             for sensorId in range(6):
                 temp = inData[3+sensorId*3]
                 rh = inData[4+sensorId*3]
                 if not (("Error" in temp) or ("Error" in rh)):
                     data.append({'sensor_id':sensorId, 'values':(float(temp),float(rh),)})
-                    self.addData(ts,data) 
                 else:
                     print "Error found here: " + row 
+            self.addData(ts,data) 
         self.conn.commit()
         
     def getData(self):
@@ -198,6 +226,11 @@ def testDb():
     myDb.update1()
     myDb.addOldData('room.log')
     
+    # Connect the database to the logger and start logging
+    myLogger = Logger("/dev/ttyUSB0", "test1.log", sampleTime=3)
+    myLogger.attachDb(myDb)
+    myLogger.start()
+    
 def testSimulation():
     """Test simulated data"""
     mode = 0
@@ -212,7 +245,7 @@ def testSimulation():
             myLogger = Logger("/dev/ttyUSB0", "test2.log", sampleTime=5)
             print myLogger.getReading()
 if __name__=="__main__":
-    testSimulation()
+    testDb()
     
 
 
