@@ -10,7 +10,7 @@ import random
 info = logging.getLogger(__name__).info
 error = logging.getLogger(__name__).error
 
-SIMULATION = True
+SIMULATION = False
 
 class SerialSimulator:
     """Class used for simulating serial data"""
